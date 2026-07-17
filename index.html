@@ -82,34 +82,34 @@
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 200;
-      background: var(--blue); height: 68px; padding: 0 32px;
+      background: var(--sand); height: 68px; padding: 0 32px;
       transition: height .3s, background .3s, backdrop-filter .3s;
     }
     nav.scrolled {
       height: 56px;
-      background: rgba(34,112,212,.82);
+      background: rgba(236,206,168,.90);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
     .nav-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 20px; }
     .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
-    .nav-logo svg { width: 40px; height: auto; color: var(--sand); }
-    .nav-wordmark { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; color: var(--white); line-height: 1.1; }
-    .nav-wordmark span { display: block; color: var(--sand); font-size: 9px; letter-spacing: .24em; font-weight: 600; }
-    .nav-phone { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--sand); text-decoration: none; letter-spacing: .04em; transition: color .18s; }
-    .nav-phone:hover { color: var(--white); }
+    .nav-logo svg { width: 40px; height: auto; color: var(--navy); }
+    .nav-wordmark { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; color: var(--navy); line-height: 1.1; }
+    .nav-wordmark span { display: block; color: var(--blue); font-size: 9px; letter-spacing: .24em; font-weight: 600; }
+    .nav-phone { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--navy); text-decoration: none; letter-spacing: .04em; transition: color .18s; }
+    .nav-phone:hover { color: var(--blue); }
     .nav-cta {
       font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 13px;
       letter-spacing: .10em; text-transform: uppercase; text-decoration: none;
-      background: var(--navy); color: var(--sand);
+      background: var(--blue); color: var(--white);
       padding: 11px 22px; border-radius: 5px; white-space: nowrap;
       transition: background .18s, color .18s;
     }
-    .nav-cta:hover { background: #071828; color: var(--white); }
+    .nav-cta:hover { background: #1860bf; color: var(--white); }
 
     /* ── HERO ── */
     .hero {
-      background: var(--navy); min-height: 92vh;
+      background: var(--blue); min-height: 92vh;
       display: flex; flex-direction: column; justify-content: center;
       padding: 100px 32px 80px; position: relative; overflow: hidden;
     }
@@ -320,7 +320,7 @@
     <h1 class="reveal" style="transition-delay:.12s">Elko's <em>Window</em> Washing Company.</h1>
     <p class="hero-sub reveal" style="transition-delay:.24s">Crystal-clear windows for your home or business. We work around your schedule — not the other way around. Free estimate within one business day.</p>
     <div class="hero-actions reveal" style="transition-delay:.36s">
-      <a href="#estimate" class="btn btn-blue" style="font-size:18px;padding:20px 48px">Get Your Free Estimate</a>
+      <a href="#estimate" class="btn btn-sand" style="font-size:18px;padding:20px 48px">Get Your Free Estimate</a>
       <a href="tel:+17754606004" class="btn btn-ghost">Call: (775) 460-6004</a>
     </div>
     <p class="hero-proof reveal" style="transition-delay:.48s">★★★★★ &nbsp; 10 Five-Star Reviews on Google &nbsp;·&nbsp; 40+ Clients Served</p>
