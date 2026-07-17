@@ -118,9 +118,10 @@
       position: absolute; inset: 0; pointer-events: none; opacity: .04;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
     }
-    .hero-wm {
-      position: absolute; right: -4%; bottom: -8%;
-      width: min(58vw,680px); color: var(--white); opacity: .03; pointer-events: none;
+    #sq-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; opacity: .45;
     }
     .hero-inner { max-width: 1120px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
     .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .40em; text-transform: uppercase; color: var(--sand); opacity: .80; margin-bottom: 24px; }
@@ -314,7 +315,7 @@
 
 <!-- HERO -->
 <section class="hero" aria-label="Hero">
-  <svg class="hero-wm" viewBox="0 0 1000 606.2" aria-hidden="true"><use href="#wmark"/></svg>
+  <canvas id="sq-canvas" aria-hidden="true"></canvas>
   <div class="hero-inner">
     <p class="hero-eyebrow reveal">Elko, NV · Owner-Operated · Licensed &amp; Insured</p>
     <h1 class="reveal" style="transition-delay:.12s">Elko's <em>Window</em> Washing Company.</h1>
@@ -615,6 +616,135 @@
     });
   }, { threshold: 0.5 });
   document.querySelectorAll('.count').forEach(el => countObs.observe(el));
+
+  // 3D Squeegee Background
+  (function() {
+    const canvas = document.getElementById('sq-canvas');
+    const ctx = canvas.getContext('2d');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resize() {
+      const hero = canvas.parentElement;
+      canvas.width  = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let mx = 0.5, my = 0.5;
+    if (!reduced) {
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX / window.innerWidth;
+        my = e.clientY / window.innerHeight;
+      });
+    }
+    let crx = 0, cry = 0;
+
+    // Brand colors per face
+    const C = {
+      bladeFront : '#12192a', bladeSide  : '#080d14',
+      frameFront : '#ECCEA8', frameSide  : '#c9a97a', frameTop : '#f5debb',
+      hFront     : '#1c4a9a', hSide      : '#0E2A52', hTop     : '#2a6ad4',
+    };
+
+    // 3D rotation helpers
+    function rotX([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x, y*c-z*s, y*s+z*c]; }
+    function rotY([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x*c+z*s, y,-x*s+z*c]; }
+    function rotZ([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x*c-y*s, x*s+y*c, z]; }
+
+    function proj(v, cx, cy) {
+      const fl = 700, sc = fl / (fl + v[2]);
+      return [cx + v[0]*sc, cy + v[1]*sc];
+    }
+
+    // Build a box's 6 faces, each with 4 vertices and a fill color
+    function box(w, h, d, ox, oy, oz, fc, sc, tc) {
+      const hx=w/2, hy=h/2, hz=d/2;
+      return [
+        { verts:[[-hx+ox,-hy+oy, hz+oz],[ hx+ox,-hy+oy, hz+oz],[ hx+ox, hy+oy, hz+oz],[-hx+ox, hy+oy, hz+oz]], color:fc },
+        { verts:[[ hx+ox,-hy+oy,-hz+oz],[-hx+ox,-hy+oy,-hz+oz],[-hx+ox, hy+oy,-hz+oz],[ hx+ox, hy+oy,-hz+oz]], color:sc },
+        { verts:[[-hx+ox,-hy+oy,-hz+oz],[ hx+ox,-hy+oy,-hz+oz],[ hx+ox,-hy+oy, hz+oz],[-hx+ox,-hy+oy, hz+oz]], color:tc },
+        { verts:[[-hx+ox, hy+oy, hz+oz],[ hx+ox, hy+oy, hz+oz],[ hx+ox, hy+oy,-hz+oz],[-hx+ox, hy+oy,-hz+oz]], color:sc },
+        { verts:[[-hx+ox,-hy+oy,-hz+oz],[-hx+ox,-hy+oy, hz+oz],[-hx+ox, hy+oy, hz+oz],[-hx+ox, hy+oy,-hz+oz]], color:sc },
+        { verts:[[ hx+ox,-hy+oy, hz+oz],[ hx+ox,-hy+oy,-hz+oz],[ hx+ox, hy+oy,-hz+oz],[ hx+ox, hy+oy, hz+oz]], color:sc },
+      ];
+    }
+
+    // Build handle as a tilted box by rotating its vertices ~30° on X axis around frame top
+    function tiltedHandle() {
+      const w=14, h=200, d=14;
+      const ang = -0.52; // tilt forward
+      const raw = box(w, h, d, 0, 0, 0, C.hFront, C.hSide, C.hTop);
+      return raw.map(f => ({
+        ...f,
+        verts: f.verts.map(([x,y,z]) => {
+          // tilt around top of handle (y = -h/2)
+          const ly = y + h/2;
+          const ty = ly * Math.cos(ang) - z * Math.sin(ang);
+          const tz = ly * Math.sin(ang) + z * Math.cos(ang);
+          return [x, ty - h/2 - 34, tz + 10];
+        })
+      }));
+    }
+
+    // All faces of the squeegee
+    const SQ = [
+      ...box(240, 10, 8,  0,  0,  0, C.bladeFront, C.bladeSide, C.bladeSide),
+      ...box(210, 24, 18, 0, -20,  5, C.frameFront, C.frameSide, C.frameTop),
+      ...tiltedHandle(),
+    ];
+
+    function renderFrame(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const t = time / 1000;
+      const floatY  = reduced ? 0 : Math.sin(t * 0.55) * 22;
+      const autoRY  = reduced ? 0.45 : t * 0.20;
+      const autoRZ  = reduced ? 0    : Math.sin(t * 0.38) * 0.055;
+
+      const trx = (my - 0.5) * 0.50;
+      const try_ = (mx - 0.5) * 0.70;
+      crx += (trx - crx) * 0.035;
+      cry += (try_ - cry) * 0.035;
+
+      const rx = crx, ry = autoRY + cry, rz = autoRZ;
+      const scale = canvas.height * 0.00175;
+      const cx = canvas.width  * 0.70;
+      const cy = canvas.height * 0.50 + floatY;
+
+      // Transform all faces
+      const tf = SQ.map(f => {
+        const tv = f.verts.map(v => {
+          let p = rotX(v, rx);
+          p = rotY(p, ry);
+          p = rotZ(p, rz);
+          return [p[0]*scale, p[1]*scale, p[2]*scale];
+        });
+        const avgZ = tv.reduce((s,v)=>s+v[2],0)/tv.length;
+        return { color: f.color, tv, avgZ };
+      });
+
+      // Back-to-front sort (painter's algorithm)
+      tf.sort((a,b) => a.avgZ - b.avgZ);
+
+      tf.forEach(f => {
+        const pts = f.tv.map(v => proj(v, cx, cy));
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0], pts[i][1]);
+        ctx.closePath();
+        ctx.fillStyle = f.color;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.20)';
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+      });
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    requestAnimationFrame(renderFrame);
+  })();
 </script>
 </body>
 </html>
