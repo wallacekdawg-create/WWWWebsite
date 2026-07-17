@@ -8,460 +8,291 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500;1,700&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --blue:  #2270D4;
       --sand:  #ECCEA8;
       --navy:  #0E2A52;
       --white: #F2F0ED;
-      --ink:   #0E2A52;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
       font-family: 'Barlow', system-ui, sans-serif;
-      color: var(--ink);
+      color: var(--navy);
       background: var(--white);
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      transition: opacity 0.55s ease;
     }
+    @media (hover: hover) { body { cursor: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      body { opacity: 1 !important; transition: none; }
+      .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    /* ── CURSOR ── */
+    #cur {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--sand); pointer-events: none;
+      transform: translate(-50%,-50%);
+      transition: width .2s, height .2s, background .2s, opacity .3s;
+      opacity: 0;
+    }
+    #cur.on  { opacity: 1; }
+    #cur.big { width: 34px; height: 34px; background: rgba(236,206,168,.22); border: 1.5px solid var(--sand); }
+
+    /* ── REVEALS ── */
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.in { opacity: 1; transform: none; }
 
     /* ── UTILS ── */
     .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
-
-    .btn {
-      display: inline-block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800;
-      font-size: 17px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      text-decoration: none;
-      padding: 17px 38px;
-      border-radius: 6px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.1s;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn-blue  { background: var(--blue);  color: var(--white); border-color: var(--blue); }
-    .btn-blue:hover  { background: #1860bf; border-color: #1860bf; }
-    .btn-sand  { background: var(--sand);  color: var(--navy);  border-color: var(--sand); }
-    .btn-sand:hover  { background: #e4c18e; border-color: #e4c18e; }
-    .btn-ghost { background: transparent; color: var(--sand); border-color: rgba(236,206,168,0.45); }
-    .btn-ghost:hover { background: rgba(236,206,168,0.12); }
-
-    section { padding: 112px 0; }
+    section { padding: 130px 0; }
     .eyebrow {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.38em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 16px;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+      font-size: 12px; letter-spacing: .40em; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 16px;
     }
     h2 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900;
-      font-size: clamp(46px, 7.5vw, 88px);
-      line-height: 0.93;
-      letter-spacing: 0.005em;
-      text-transform: uppercase;
-      color: var(--navy);
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+      font-size: clamp(52px, 9vw, 116px); line-height: .91;
+      letter-spacing: .005em; text-transform: uppercase; color: var(--navy);
     }
     h2 em { font-style: italic; color: var(--blue); }
-    .lead {
-      font-size: clamp(16px, 1.6vw, 19px);
-      color: rgba(14,42,82,0.65);
-      max-width: 54ch;
-      margin-top: 22px;
-      line-height: 1.6;
+    .lead { font-size: clamp(16px,1.6vw,19px); color: rgba(14,42,82,.65); max-width: 54ch; margin-top: 22px; line-height: 1.6; }
+    .rule { height: 1px; background: var(--navy); opacity: .10; }
+    .btn {
+      display: inline-block; font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800; font-size: 17px; letter-spacing: .08em;
+      text-transform: uppercase; text-decoration: none; padding: 17px 38px;
+      border-radius: 6px; border: 2px solid transparent;
+      transition: background .18s, color .18s, border-color .18s;
+      will-change: transform;
     }
-    .rule { height: 2px; background: var(--navy); opacity: 0.09; }
+    .btn-blue  { background: var(--blue); color: var(--white); border-color: var(--blue); }
+    .btn-blue:hover  { background: #1860bf; border-color: #1860bf; }
+    .btn-sand  { background: var(--sand); color: var(--navy); border-color: var(--sand); }
+    .btn-sand:hover  { background: #e4c18e; border-color: #e4c18e; }
+    .btn-ghost { background: transparent; color: var(--sand); border-color: rgba(236,206,168,.4); }
+    .btn-ghost:hover { background: rgba(236,206,168,.1); }
 
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 200;
-      background: var(--blue);
-      padding: 0 32px;
+      background: var(--blue); height: 68px; padding: 0 32px;
+      transition: height .3s, background .3s, backdrop-filter .3s;
     }
-    .nav-inner {
-      max-width: 1120px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 68px; gap: 20px;
+    nav.scrolled {
+      height: 56px;
+      background: rgba(34,112,212,.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
-    .nav-logo {
-      display: flex; align-items: center; gap: 11px;
-      text-decoration: none; flex-shrink: 0;
-    }
-    .nav-logo svg { width: 44px; height: auto; color: var(--sand); }
-    .nav-wordmark {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 18px; letter-spacing: 0.05em;
-      text-transform: uppercase; color: var(--white); line-height: 1.1;
-    }
-    .nav-wordmark span {
-      display: block; color: var(--sand);
-      font-size: 10px; letter-spacing: 0.22em; font-weight: 600;
-    }
-    .nav-phone {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 19px;
-      color: var(--sand); text-decoration: none; letter-spacing: 0.04em;
-    }
+    .nav-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 100%; gap: 20px; }
+    .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
+    .nav-logo svg { width: 40px; height: auto; color: var(--sand); }
+    .nav-wordmark { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; color: var(--white); line-height: 1.1; }
+    .nav-wordmark span { display: block; color: var(--sand); font-size: 9px; letter-spacing: .24em; font-weight: 600; }
+    .nav-phone { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--sand); text-decoration: none; letter-spacing: .04em; transition: color .18s; }
     .nav-phone:hover { color: var(--white); }
     .nav-cta {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800; font-size: 14px; letter-spacing: 0.1em;
-      text-transform: uppercase; text-decoration: none;
-      background: var(--blue); color: var(--white);
-      padding: 11px 22px; border-radius: 5px;
-      transition: background 0.18s; white-space: nowrap;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 13px;
+      letter-spacing: .10em; text-transform: uppercase; text-decoration: none;
+      background: var(--navy); color: var(--sand);
+      padding: 11px 22px; border-radius: 5px; white-space: nowrap;
+      transition: background .18s, color .18s;
     }
-    .nav-cta:hover { background: #1860bf; }
+    .nav-cta:hover { background: #071828; color: var(--white); }
 
     /* ── HERO ── */
     .hero {
-      background: var(--navy);
-      min-height: 90vh; display: flex; flex-direction: column;
-      justify-content: center; padding: 100px 32px 80px;
+      background: var(--navy); min-height: 92vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 32px 80px; position: relative; overflow: hidden;
     }
-    .hero-inner { max-width: 1120px; margin: 0 auto; width: 100%; }
-    .hero-eyebrow {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 13px; letter-spacing: 0.38em;
-      text-transform: uppercase; color: var(--sand); opacity: 0.85;
-      margin-bottom: 22px;
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none; opacity: .04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
     }
+    .hero-wm {
+      position: absolute; right: -4%; bottom: -8%;
+      width: min(58vw,680px); color: var(--white); opacity: .03; pointer-events: none;
+    }
+    .hero-inner { max-width: 1120px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+    .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .40em; text-transform: uppercase; color: var(--sand); opacity: .80; margin-bottom: 24px; }
     .hero h1 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-style: italic;
-      font-size: clamp(54px, 9.5vw, 112px);
-      line-height: 0.91; letter-spacing: 0.01em;
-      text-transform: uppercase; color: var(--white);
-      max-width: 14ch;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic;
+      font-size: clamp(64px,12vw,140px); line-height: .89; letter-spacing: .01em;
+      text-transform: uppercase; color: var(--white); max-width: 14ch;
     }
     .hero h1 em { color: var(--sand); }
-    .hero-sub {
-      font-size: clamp(17px, 1.8vw, 21px);
-      color: rgba(242,240,237,0.68); max-width: 50ch;
-      margin-top: 30px; line-height: 1.55;
-    }
-    .hero-actions {
-      display: flex; align-items: center; gap: 16px;
-      flex-wrap: wrap; margin-top: 44px;
-    }
-    .hero-proof {
-      margin-top: 22px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 15px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--sand); opacity: 0.75;
-    }
+    .hero-sub { font-size: clamp(17px,1.8vw,20px); color: rgba(242,240,237,.65); max-width: 48ch; margin-top: 32px; line-height: 1.6; }
+    .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 44px; }
+    .hero-proof { margin-top: 24px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; color: var(--sand); opacity: .62; }
 
-    /* ── TRUST BAR ── */
-    .trust-bar { background: var(--blue); padding: 20px 32px; }
-    .trust-inner {
-      max-width: 1120px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: center;
-      flex-wrap: wrap; gap: 24px 44px;
+    /* ── MARQUEE ── */
+    .marquee-bar { background: var(--blue); padding: 17px 0; overflow: hidden; }
+    .marquee-track { display: flex; width: max-content; animation: ticker 24s linear infinite; }
+    .marquee-bar:hover .marquee-track { animation-play-state: paused; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .m-item {
+      display: flex; align-items: center; gap: 9px; padding: 0 36px;
+      font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--white); white-space: nowrap; flex-shrink: 0;
     }
-    .trust-item {
-      display: flex; align-items: center; gap: 9px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 15px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--white);
-    }
-    .trust-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .trust-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--sand); opacity: 0.4; }
+    .m-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .m-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--sand); opacity: .4; flex-shrink: 0; }
 
-    /* ── SERVICES ── */
-    .services-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 18px; margin-top: 56px;
+    /* ── SERVICES EDITORIAL ── */
+    .svc-list { margin-top: 64px; }
+    .svc-row {
+      display: grid; grid-template-columns: 60px 1fr; gap: 0 36px;
+      padding: 36px 0; border-top: 1px solid rgba(14,42,82,.11);
+      transition: padding-left .35s cubic-bezier(.25,.46,.45,.94);
     }
-    .service-card {
-      background: var(--white);
-      border: 1.5px solid rgba(14,42,82,0.11);
-      border-radius: 16px; padding: 36px 28px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .service-card:hover {
-      border-color: var(--blue);
-      box-shadow: 0 8px 32px rgba(34,112,212,0.1);
-    }
-    .svc-icon {
-      width: 46px; height: 46px;
-      background: rgba(34,112,212,0.09);
-      border-radius: 12px; display: flex; align-items: center; justify-content: center;
-      margin-bottom: 22px;
-    }
-    .svc-icon svg { width: 22px; height: 22px; color: var(--blue); }
-    .service-card h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 24px;
-      text-transform: uppercase; color: var(--navy);
-      line-height: 1; margin-bottom: 10px;
-    }
-    .service-card p { font-size: 15px; color: rgba(14,42,82,0.62); line-height: 1.62; }
+    .svc-row:last-child { border-bottom: 1px solid rgba(14,42,82,.11); }
+    .svc-row:hover { padding-left: 14px; }
+    .svc-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 30px; color: var(--blue); opacity: .40; line-height: 1; padding-top: 6px; }
+    .svc-row h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(22px,3vw,30px); text-transform: uppercase; color: var(--navy); line-height: 1; margin-bottom: 9px; transition: color .2s; }
+    .svc-row:hover h3 { color: var(--blue); }
+    .svc-row p { font-size: 15px; color: rgba(14,42,82,.57); line-height: 1.65; max-width: 60ch; }
 
-    /* ── WHY US ── */
+    /* ── WHY ── */
     .why-section { background: var(--navy); }
-    .why-section .eyebrow { color: var(--sand); opacity: 0.8; }
+    .why-section .eyebrow { color: var(--sand); opacity: .75; }
     .why-section h2 { color: var(--white); }
     .why-section h2 em { color: var(--sand); }
-    .why-section .lead { color: rgba(242,240,237,0.60); }
-    .why-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr);
-      gap: 2px; margin-top: 56px;
-      border: 2px solid rgba(255,255,255,0.07);
-      border-radius: 16px; overflow: hidden;
-    }
-    .why-item {
-      background: rgba(255,255,255,0.035);
-      padding: 40px 36px;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .why-num {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-style: italic; font-size: 44px;
-      color: var(--sand); opacity: 0.28; line-height: 1; margin-bottom: 14px;
-    }
-    .why-item h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 22px;
-      text-transform: uppercase; color: var(--white); margin-bottom: 10px;
-    }
-    .why-item p { font-size: 15px; color: rgba(242,240,237,0.56); line-height: 1.65; }
+    .why-section .lead { color: rgba(242,240,237,.58); }
+    .why-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; margin-top: 64px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.06); border-radius: 16px; overflow: hidden; }
+    .why-item { background: var(--navy); padding: 44px 40px; border: 1px solid rgba(255,255,255,.05); }
+    .why-n { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: 52px; color: var(--sand); opacity: .18; line-height: 1; margin-bottom: 16px; }
+    .why-item h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 22px; text-transform: uppercase; color: var(--white); margin-bottom: 12px; }
+    .why-item p { font-size: 15px; color: rgba(242,240,237,.52); line-height: 1.7; }
 
     /* ── STEPS ── */
-    .steps {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 0; margin-top: 64px; position: relative;
-    }
-    .steps::before {
-      content: '';
-      position: absolute; top: 31px;
-      left: calc(16.666% + 28px); right: calc(16.666% + 28px);
-      height: 2px; background: var(--blue); opacity: 0.2;
-    }
-    .step { text-align: center; padding: 0 28px; }
-    .step-num {
-      width: 62px; height: 62px; border-radius: 50%;
-      background: var(--blue); color: var(--white);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 26px;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 24px;
-    }
-    .step h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 21px;
-      text-transform: uppercase; color: var(--navy); margin-bottom: 10px;
-    }
-    .step p { font-size: 15px; color: rgba(14,42,82,0.58); line-height: 1.62; }
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; margin-top: 72px; position: relative; }
+    .steps::before { content: ''; position: absolute; top: 31px; left: calc(16.666% + 28px); right: calc(16.666% + 28px); height: 1px; background: var(--blue); opacity: .22; }
+    .step { text-align: center; padding: 0 32px; }
+    .step-num { width: 62px; height: 62px; border-radius: 50%; background: var(--blue); color: var(--white); font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; display: flex; align-items: center; justify-content: center; margin: 0 auto 26px; }
+    .step h3 { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 21px; text-transform: uppercase; color: var(--navy); margin-bottom: 10px; }
+    .step p { font-size: 15px; color: rgba(14,42,82,.57); line-height: 1.62; }
 
-    /* ── TESTIMONIALS ── */
+    /* ── STATS ── */
+    .stats-section { background: var(--navy); }
+    .stats-section .eyebrow { color: var(--sand); opacity: .72; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 52px; border-top: 1px solid rgba(255,255,255,.08); }
+    .stat-item { padding: 48px 32px 48px 0; border-right: 1px solid rgba(255,255,255,.08); }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:not(:first-child) { padding-left: 32px; }
+    .stat-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-style: italic; font-size: clamp(64px,9vw,104px); line-height: .9; color: var(--white); }
+    .stat-num .accent { color: var(--sand); }
+    .stat-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .30em; text-transform: uppercase; color: rgba(242,240,237,.42); margin-top: 10px; }
+
+    /* ── TESTIMONIALS EDITORIAL ── */
     .testimonials-section { background: var(--sand); }
-    .testimonials-section .eyebrow { color: rgba(14,42,82,0.65); }
+    .testimonials-section .eyebrow { color: rgba(14,42,82,.58); }
     .testimonials-section h2 { color: var(--navy); }
     .testimonials-section h2 em { color: var(--blue); }
-    .reviews-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 18px; margin-top: 52px;
-    }
-    .review-card {
-      background: var(--white); border-radius: 14px; padding: 30px 28px;
-    }
-    .stars { display: flex; gap: 3px; margin-bottom: 14px; }
-    .stars svg { width: 17px; height: 17px; fill: #F5A623; }
-    .review-card blockquote {
-      font-size: 15px; font-style: italic;
-      color: rgba(14,42,82,0.78); line-height: 1.65;
-      margin-bottom: 18px;
-    }
-    .reviewer {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800; font-size: 14px;
-      text-transform: uppercase; letter-spacing: 0.07em; color: var(--navy);
-    }
-    .review-src { font-size: 12px; color: rgba(14,42,82,0.42); margin-top: 2px; }
-    .reviews-footer {
-      text-align: center; margin-top: 40px;
-    }
-    .reviews-footer a {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 16px; letter-spacing: 0.07em;
-      text-transform: uppercase; color: var(--blue); text-decoration: none;
-    }
+    .quote-list { margin-top: 64px; }
+    .q-item { padding: 52px 0; border-top: 1px solid rgba(14,42,82,.14); position: relative; }
+    .q-item:last-child { border-bottom: 1px solid rgba(14,42,82,.14); }
+    .q-mark { position: absolute; top: 32px; right: 0; font-family: Georgia, serif; font-size: 110px; line-height: .6; color: var(--blue); opacity: .14; pointer-events: none; user-select: none; }
+    .q-stars { display: flex; gap: 3px; margin-bottom: 20px; }
+    .q-stars svg { width: 15px; height: 15px; fill: #c49840; }
+    .q-text { font-size: clamp(17px,2vw,21px); font-style: italic; color: rgba(14,42,82,.78); line-height: 1.62; max-width: 72ch; margin-bottom: 20px; }
+    .q-by { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--navy); }
+    .q-src { font-size: 12px; color: rgba(14,42,82,.38); margin-top: 3px; }
+    .reviews-footer { margin-top: 44px; }
+    .reviews-footer a { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .07em; text-transform: uppercase; color: var(--blue); text-decoration: none; }
     .reviews-footer a:hover { text-decoration: underline; }
 
     /* ── COMMERCIAL ── */
     .commercial-section { background: var(--blue); }
-    .commercial-section .eyebrow { color: var(--sand); opacity: 0.85; }
+    .commercial-section .eyebrow { color: var(--sand); opacity: .85; }
     .commercial-section h2 { color: var(--white); }
     .commercial-section h2 em { color: var(--sand); }
-    .commercial-section .lead { color: rgba(242,240,237,0.68); }
-    .commercial-inner {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 80px; align-items: center;
-    }
-    .client-stack { display: flex; flex-direction: column; gap: 14px; }
-    .client-card {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.16);
-      border-radius: 12px; padding: 22px 26px;
-    }
-    .client-card strong {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 22px;
-      text-transform: uppercase; letter-spacing: 0.03em; color: var(--white);
-      display: block;
-    }
-    .client-card span {
-      font-size: 12px; font-weight: 600; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--sand); opacity: 0.75;
-      margin-top: 3px; display: block;
-    }
-    .client-next {
-      border: 1.5px dashed rgba(255,255,255,0.2); border-radius: 12px;
-      padding: 22px 26px; font-size: 15px;
-      color: rgba(255,255,255,0.45); font-style: italic;
-      text-align: center; letter-spacing: 0.02em;
-    }
+    .commercial-section .lead { color: rgba(242,240,237,.68); }
+    .comm-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .client-stack { display: flex; flex-direction: column; }
+    .client-card { padding: 24px 0; border-top: 1px solid rgba(255,255,255,.14); }
+    .client-card:last-of-type { border-bottom: 1px solid rgba(255,255,255,.14); }
+    .client-card strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 26px; text-transform: uppercase; letter-spacing: .02em; color: var(--white); display: block; }
+    .client-card span { font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--sand); opacity: .68; margin-top: 3px; display: block; }
+    .client-next { padding: 22px 0; font-size: 15px; font-style: italic; color: rgba(255,255,255,.36); }
 
-    /* ── ESTIMATE FORM ── */
+    /* ── FORM ── */
     .form-section { background: var(--white); }
     .form-wrap { max-width: 680px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .field { display: flex; flex-direction: column; gap: 7px; }
-    .field label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 12px;
-      letter-spacing: 0.22em; text-transform: uppercase; color: var(--navy);
-    }
-    .field input, .field textarea, .field select {
-      padding: 14px 16px;
-      border: 1.5px solid rgba(14,42,82,0.16);
-      border-radius: 8px;
-      font-family: 'Barlow', sans-serif; font-size: 16px; color: var(--navy);
-      background: var(--white); outline: none;
-      transition: border-color 0.18s;
-      -webkit-appearance: none; appearance: none;
-    }
-    .field input:focus, .field textarea:focus, .field select:focus {
-      border-color: var(--blue);
-    }
+    .field label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--navy); }
+    .field input, .field textarea { padding: 14px 16px; border: 1.5px solid rgba(14,42,82,.14); border-radius: 8px; font-family: 'Barlow', sans-serif; font-size: 16px; color: var(--navy); background: var(--white); outline: none; transition: border-color .18s; }
+    .field input:focus, .field textarea:focus { border-color: var(--blue); }
     .field textarea { resize: vertical; }
-    .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
-    .checkbox-label {
-      display: flex; align-items: center; gap: 8px;
-      padding: 11px 18px;
-      border: 1.5px solid rgba(14,42,82,0.16); border-radius: 8px;
-      cursor: pointer; font-size: 15px; font-weight: 500;
-      transition: border-color 0.18s, background 0.18s; user-select: none;
-    }
-    .checkbox-label:hover { border-color: var(--blue); }
-    .checkbox-label input { accent-color: var(--blue); }
-    .form-submit {
-      width: 100%; margin-top: 24px;
-      font-size: 18px; padding: 20px;
-    }
-    .form-note {
-      text-align: center; font-size: 13px;
-      color: rgba(14,42,82,0.4); margin-top: 12px; letter-spacing: 0.04em;
-    }
+    .cb-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .cb-label { display: flex; align-items: center; gap: 8px; padding: 11px 18px; border: 1.5px solid rgba(14,42,82,.14); border-radius: 8px; font-size: 15px; font-weight: 500; transition: border-color .18s; user-select: none; }
+    .cb-label:hover { border-color: var(--blue); }
+    .cb-label input { accent-color: var(--blue); }
+    .form-btn { width: 100%; margin-top: 24px; font-size: 18px; padding: 20px; }
+    .form-note { text-align: center; font-size: 13px; color: rgba(14,42,82,.36); margin-top: 12px; letter-spacing: .04em; }
 
     /* ── FINAL CTA ── */
-    .cta-section {
-      background: var(--navy); text-align: center;
-      padding: 120px 32px;
-    }
-    .cta-section .eyebrow { color: var(--sand); opacity: 0.7; }
+    .cta-section { background: var(--navy); text-align: center; padding: 130px 32px; }
+    .cta-section .eyebrow { color: var(--sand); opacity: .62; }
     .cta-section h2 { color: var(--white); }
     .cta-section h2 em { color: var(--sand); }
-    .cta-section .lead { color: rgba(242,240,237,0.60); margin: 20px auto 0; }
-    .cta-phone {
-      display: block; margin-top: 16px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 900; font-size: 36px;
-      color: var(--sand); text-decoration: none; letter-spacing: 0.04em;
-    }
+    .cta-section .lead { color: rgba(242,240,237,.57); margin: 22px auto 0; }
+    .cta-phone { display: block; margin-top: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: clamp(36px,5vw,58px); color: var(--sand); text-decoration: none; letter-spacing: .04em; transition: color .18s; }
     .cta-phone:hover { color: var(--white); }
-    .cta-or {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700; font-size: 13px; letter-spacing: 0.3em;
-      text-transform: uppercase; color: rgba(242,240,237,0.3);
-      margin: 20px 0;
-    }
-    .cta-sub {
-      display: block; margin-top: 10px;
-      font-size: 13px; color: rgba(242,240,237,0.38);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
-    }
+    .cta-or { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: rgba(242,240,237,.22); margin: 24px 0; }
+    .cta-sub { display: block; margin-top: 12px; font-size: 12px; color: rgba(242,240,237,.30); letter-spacing: .10em; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; }
 
     /* ── FOOTER ── */
-    footer { background: #06101F; padding: 52px 0; }
-    .footer-inner {
-      max-width: 1120px; margin: 0 auto; padding: 0 32px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 24px;
-    }
-    .footer-brand {
-      display: flex; align-items: center; gap: 11px;
-    }
-    .footer-brand svg { width: 40px; height: auto; color: var(--sand); opacity: 0.5; }
-    .footer-brand-name {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 800; font-size: 15px;
-      text-transform: uppercase; color: rgba(242,240,237,0.45);
-      letter-spacing: 0.05em;
-    }
+    footer { background: #060F1E; padding: 52px 0; }
+    .footer-inner { max-width: 1120px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+    .footer-brand { display: flex; align-items: center; gap: 11px; }
+    .footer-brand svg { width: 38px; height: auto; color: var(--sand); opacity: .44; }
+    .footer-brand-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 14px; text-transform: uppercase; color: rgba(242,240,237,.38); letter-spacing: .05em; }
     .footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
-    .footer-links a {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 600; font-size: 12px;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: rgba(242,240,237,0.35); text-decoration: none;
-      transition: color 0.18s;
-    }
-    .footer-links a:hover { color: rgba(242,240,237,0.75); }
-    .footer-copy {
-      font-size: 12px; color: rgba(242,240,237,0.25); letter-spacing: 0.04em;
-    }
+    .footer-links a { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: rgba(242,240,237,.28); text-decoration: none; transition: color .18s; }
+    .footer-links a:hover { color: rgba(242,240,237,.70); }
+    .footer-copy { font-size: 12px; color: rgba(242,240,237,.20); letter-spacing: .04em; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 860px) {
-      .services-grid { grid-template-columns: repeat(2, 1fr); }
       .why-grid      { grid-template-columns: 1fr; }
-      .reviews-grid  { grid-template-columns: 1fr; }
-      .commercial-inner { grid-template-columns: 1fr; gap: 48px; }
-      section { padding: 80px 0; }
+      .comm-inner    { grid-template-columns: 1fr; gap: 52px; }
+      .stats-grid    { grid-template-columns: 1fr 1fr; }
+      .stat-item:last-child { border-top: 1px solid rgba(255,255,255,.08); grid-column: 1/-1; border-right: none; padding-left: 0; }
+      section { padding: 90px 0; }
       .nav-phone { display: none; }
     }
     @media (max-width: 620px) {
-      .services-grid { grid-template-columns: 1fr; }
+      .svc-row       { grid-template-columns: 44px 1fr; gap: 0 18px; padding: 28px 0; }
       .form-grid     { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: 1fr; }
+      .steps         { grid-template-columns: 1fr; }
       .steps::before { display: none; }
-      .step { text-align: left; display: flex; align-items: flex-start; gap: 20px; padding: 0; margin-bottom: 28px; }
-      .step-num { flex-shrink: 0; margin: 0; }
-      .hero-actions { flex-direction: column; align-items: flex-start; }
-      .hero { padding: 80px 24px 60px; }
-      .cta-section { padding: 80px 24px; }
-      nav { padding: 0 20px; }
-      .wrap { padding: 0 20px; }
+      .step          { text-align: left; display: flex; align-items: flex-start; gap: 20px; padding: 0; margin-bottom: 32px; }
+      .step-num      { flex-shrink: 0; margin: 0; }
+      .hero-actions  { flex-direction: column; align-items: flex-start; }
+      .hero          { padding: 80px 24px 60px; }
+      .cta-section   { padding: 90px 24px; }
+      nav            { padding: 0 20px; }
+      .wrap          { padding: 0 20px; }
+      .stats-grid    { grid-template-columns: 1fr; }
+      .stat-item     { border-right: none !important; padding-left: 0 !important; border-top: 1px solid rgba(255,255,255,.08); padding-bottom: 32px; }
+      .stat-item:first-child { padding-top: 32px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══ SVG SYMBOL ═══ -->
+<div id="cur" aria-hidden="true"></div>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="wmark" viewBox="0 0 1000 606.2">
     <path fill="currentColor" d="M0.0,1.7 L128.4,604.5 L321.9,604.5 L421.2,315.1 L486.3,601.0 L683.2,601.0 L887.0,0.0 L678.1,0.0 L604.5,208.9 L549.7,0.0 L354.5,0.0 L268.8,212.3 L217.5,0.0 Z"/>
@@ -469,189 +300,116 @@
   </symbol>
 </svg>
 
-<!-- ═══ NAV ═══ -->
-<nav aria-label="Site navigation">
+<!-- NAV -->
+<nav id="nav" aria-label="Site navigation">
   <div class="nav-inner">
-    <a href="#" class="nav-logo" aria-label="Wallace Window Washing — home">
+    <a href="#" class="nav-logo" aria-label="Wallace Window Washing">
       <svg viewBox="0 0 1000 606.2" aria-hidden="true"><use href="#wmark"/></svg>
-      <div class="nav-wordmark">
-        Wallace
-        <span>Window Washing</span>
-      </div>
+      <div class="nav-wordmark">Wallace<span>Window Washing</span></div>
     </a>
     <a href="tel:+17754606004" class="nav-phone">(775) 460-6004</a>
     <a href="#estimate" class="nav-cta">Free Estimate</a>
   </div>
 </nav>
 
-<!-- ═══ HERO ═══ -->
+<!-- HERO -->
 <section class="hero" aria-label="Hero">
+  <svg class="hero-wm" viewBox="0 0 1000 606.2" aria-hidden="true"><use href="#wmark"/></svg>
   <div class="hero-inner">
-    <p class="hero-eyebrow">Elko, NV · Owner-Operated · Licensed &amp; Insured</p>
-    <h1>Elko's <em>Window</em> Washing Company.</h1>
-    <p class="hero-sub">
-      Crystal-clear windows for your home or business.
-      We work around your schedule — not the other way around.
-      Free estimate within one business day.
-    </p>
-    <div class="hero-actions">
-      <a href="#estimate" class="btn btn-blue" style="font-size:18px;padding:19px 44px">Get Your Free Estimate</a>
+    <p class="hero-eyebrow reveal">Elko, NV · Owner-Operated · Licensed &amp; Insured</p>
+    <h1 class="reveal" style="transition-delay:.12s">Elko's <em>Window</em> Washing Company.</h1>
+    <p class="hero-sub reveal" style="transition-delay:.24s">Crystal-clear windows for your home or business. We work around your schedule — not the other way around. Free estimate within one business day.</p>
+    <div class="hero-actions reveal" style="transition-delay:.36s">
+      <a href="#estimate" class="btn btn-blue" style="font-size:18px;padding:20px 48px">Get Your Free Estimate</a>
       <a href="tel:+17754606004" class="btn btn-ghost">Call: (775) 460-6004</a>
     </div>
-    <p class="hero-proof">★★★★★ &nbsp; 10 Five-Star Reviews on Google &nbsp;·&nbsp; 40+ Clients Served</p>
+    <p class="hero-proof reveal" style="transition-delay:.48s">★★★★★ &nbsp; 10 Five-Star Reviews on Google &nbsp;·&nbsp; 40+ Clients Served</p>
   </div>
 </section>
 
-<!-- ═══ TRUST BAR ═══ -->
-<div class="trust-bar" aria-label="Trust indicators">
-  <div class="trust-inner">
-    <div class="trust-item">
-      <!-- star icon -->
-      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      10 Five-Star Google Reviews
-    </div>
-    <div class="trust-dot" aria-hidden="true"></div>
-    <div class="trust-item">
-      <!-- person icon -->
-      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Owner Does the Work
-    </div>
-    <div class="trust-dot" aria-hidden="true"></div>
-    <div class="trust-item">
-      <!-- calendar icon -->
-      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      We Work Around Your Schedule
-    </div>
-    <div class="trust-dot" aria-hidden="true"></div>
-    <div class="trust-item">
-      <!-- pin icon -->
-      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Locally Based in Elko, NV
-    </div>
+<!-- MARQUEE -->
+<div class="marquee-bar" aria-label="Trust indicators">
+  <div class="marquee-track" aria-hidden="true">
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>10 Five-Star Google Reviews</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Owner Does the Work</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>We Work Around Your Schedule</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Locally Based in Elko, NV</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Satisfaction Guarantee</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Commercial Recurring Service</div>
+    <div class="m-dot"></div>
+    <!-- duplicate for seamless loop -->
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>10 Five-Star Google Reviews</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Owner Does the Work</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>We Work Around Your Schedule</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Locally Based in Elko, NV</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Satisfaction Guarantee</div>
+    <div class="m-dot"></div>
+    <div class="m-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Commercial Recurring Service</div>
+    <div class="m-dot"></div>
   </div>
 </div>
 
-<!-- ═══ SERVICES ═══ -->
+<!-- SERVICES -->
 <section>
   <div class="wrap">
-    <div class="eyebrow">What We Do</div>
-    <h2>Every window.<br><em>Inside and out.</em></h2>
-    <p class="lead">We handle the full picture — exterior, interior, and screens. One call, one team, one spotless result.</p>
-
-    <div class="services-grid">
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-        </div>
-        <h3>Exterior Cleaning</h3>
-        <p>Streak-free results on every pane. We cut through hard water deposits, oxidation, and built-up grime — one story or four.</p>
-      </div>
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
-        <h3>Interior Cleaning</h3>
-        <p>We work carefully around your furniture, floors, and frames. Clean windows, zero mess left behind.</p>
-      </div>
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="16" y1="6" x2="16" y2="18"/></svg>
-        </div>
-        <h3>Screen Cleaning</h3>
-        <p>Screens hold more dirt than most people realize. We clean them so the light coming through is actually clear.</p>
-      </div>
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-        </div>
-        <h3>Commercial Service</h3>
-        <p>Storefronts, offices, retail. We offer recurring schedules so your property always looks sharp — without you having to think about it.</p>
-      </div>
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </div>
-        <h3>Satisfaction Guarantee</h3>
-        <p>Not happy with a spot? We come back. Simple. A job isn't done until you say it is.</p>
-      </div>
-
-      <div class="service-card">
-        <div class="svc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <h3>1-Day Response</h3>
-        <p>Get a clear quote within one business day. No week-long waits, no runaround. Just a number you can say yes or no to.</p>
-      </div>
-
+    <div class="eyebrow reveal">What We Do</div>
+    <h2 class="reveal" style="transition-delay:.06s">Every window.<br><em>Inside and out.</em></h2>
+    <p class="lead reveal" style="transition-delay:.12s">We handle the full picture — exterior, interior, and screens. One call, one team, one spotless result.</p>
+    <div class="svc-list">
+      <div class="svc-row reveal"><div class="svc-n">01</div><div><h3>Exterior Cleaning</h3><p>Streak-free results on every pane. We cut through hard water deposits, oxidation, and built-up grime — one story or four.</p></div></div>
+      <div class="svc-row reveal" style="transition-delay:.07s"><div class="svc-n">02</div><div><h3>Interior Cleaning</h3><p>We work carefully around your furniture, floors, and frames. Clean windows, zero mess left behind.</p></div></div>
+      <div class="svc-row reveal" style="transition-delay:.14s"><div class="svc-n">03</div><div><h3>Screen Cleaning</h3><p>Screens hold more dirt than most people realize. We clean them so the light coming through is actually clear.</p></div></div>
+      <div class="svc-row reveal" style="transition-delay:.21s"><div class="svc-n">04</div><div><h3>Commercial Service</h3><p>Storefronts, offices, retail. Recurring schedules so your property always looks sharp — without you having to think about it.</p></div></div>
+      <div class="svc-row reveal" style="transition-delay:.28s"><div class="svc-n">05</div><div><h3>Satisfaction Guarantee</h3><p>Not happy with a spot? We come back. Simple. A job isn't done until you say it is.</p></div></div>
+      <div class="svc-row reveal" style="transition-delay:.35s"><div class="svc-n">06</div><div><h3>1-Day Response</h3><p>Get a clear quote within one business day. No week-long waits, no runaround. Just a number you can say yes or no to.</p></div></div>
     </div>
   </div>
 </section>
 
 <div class="wrap"><div class="rule"></div></div>
 
-<!-- ═══ WHY WALLACE ═══ -->
+<!-- WHY WALLACE -->
 <section class="why-section">
   <div class="wrap">
-    <div class="eyebrow">Why Wallace</div>
-    <h2>Not a franchise.<br><em>Not a crew you've never met.</em></h2>
-    <p class="lead">Most window companies send whoever is available. We don't work like that.</p>
+    <div class="eyebrow reveal">Why Wallace</div>
+    <h2 class="reveal" style="transition-delay:.06s">Not a franchise.<br><em>Not a crew you've never met.</em></h2>
+    <p class="lead reveal" style="transition-delay:.12s">Most window companies send whoever is available. We don't work like that.</p>
     <div class="why-grid">
-      <div class="why-item">
-        <div class="why-num">01</div>
-        <h3>The Owner Shows Up</h3>
-        <p>When you call Wallace, you're talking to the person who comes to your door. The owner does the work. Not a random hire — the guy whose name is on the truck. That's not common anymore. It's why our standards are higher.</p>
-      </div>
-      <div class="why-item">
-        <div class="why-num">02</div>
-        <h3>Your Schedule, Not Ours</h3>
-        <p>We're flexible. Early morning, after work, weekends — we work around you. You shouldn't have to rearrange your day for a window washer. We're the ones who accommodate, not you.</p>
-      </div>
-      <div class="why-item">
-        <div class="why-num">03</div>
-        <h3>Rooted in Elko</h3>
-        <p>This isn't a franchise with a call center in another state. We live here, work here, and our reputation is built here. Every job matters — because you're our neighbor, not a ticket number.</p>
-      </div>
-      <div class="why-item">
-        <div class="why-num">04</div>
-        <h3>Straight Answers, Fast</h3>
-        <p>You get a real quote, a real time, and a real person. We call back within one business day. No ghosting, no vague estimates — just a clear number and a date that works for you.</p>
-      </div>
+      <div class="why-item reveal"><div class="why-n">01</div><h3>The Owner Shows Up</h3><p>When you call Wallace, you're talking to the person who comes to your door. The owner does the work — not a random hire. That's not common anymore. It's why our standards are higher.</p></div>
+      <div class="why-item reveal" style="transition-delay:.08s"><div class="why-n">02</div><h3>Your Schedule, Not Ours</h3><p>Early morning, after work, weekends — we work around you. You shouldn't have to rearrange your day for a window washer. We accommodate, not you.</p></div>
+      <div class="why-item reveal" style="transition-delay:.16s"><div class="why-n">03</div><h3>Rooted in Elko</h3><p>This isn't a franchise with a call center in another state. We live here, work here, and our reputation is built here. Every job matters — you're our neighbor, not a ticket number.</p></div>
+      <div class="why-item reveal" style="transition-delay:.24s"><div class="why-n">04</div><h3>Straight Answers, Fast</h3><p>You get a real quote, a real time, and a real person. We call back within one business day. No ghosting, no vague estimates — just a clear number and a date that works.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ═══ HOW IT WORKS ═══ -->
+<!-- HOW IT WORKS -->
 <section>
   <div class="wrap">
-    <div class="eyebrow">The Process</div>
-    <h2>Three steps to<br><em>spotless windows.</em></h2>
-    <p class="lead">We made it as simple as it should be. Here's exactly what happens when you reach out.</p>
+    <div class="eyebrow reveal">The Process</div>
+    <h2 class="reveal" style="transition-delay:.06s">Three steps to<br><em>spotless windows.</em></h2>
+    <p class="lead reveal" style="transition-delay:.12s">We made it as simple as it should be. Here's exactly what happens when you reach out.</p>
     <div class="steps">
-      <div class="step">
+      <div class="step reveal" style="transition-delay:.10s">
         <div class="step-num" aria-hidden="true">1</div>
-        <div>
-          <h3>Request Your Estimate</h3>
-          <p>Fill out the form below or give us a call. Takes two minutes. Tell us your address and what you need — that's it.</p>
-        </div>
+        <div><h3>Request Your Estimate</h3><p>Fill out the form below or give us a call. Takes two minutes. Tell us your address and what you need — that's it.</p></div>
       </div>
-      <div class="step">
+      <div class="step reveal" style="transition-delay:.22s">
         <div class="step-num" aria-hidden="true">2</div>
-        <div>
-          <h3>Get a Clear Quote Fast</h3>
-          <p>We'll call you back within one business day with a flat price. No hidden fees. No pressure. A number you can say yes or no to.</p>
-        </div>
+        <div><h3>Get a Clear Quote Fast</h3><p>We call back within one business day with a flat price. No hidden fees. No pressure. A number you can say yes or no to.</p></div>
       </div>
-      <div class="step">
+      <div class="step reveal" style="transition-delay:.34s">
         <div class="step-num" aria-hidden="true">3</div>
-        <div>
-          <h3>We Show Up and Deliver</h3>
-          <p>We arrive on time, do the job, and leave your windows spotless. If anything isn't right, we fix it. That's the guarantee.</p>
-        </div>
+        <div><h3>We Show Up and Deliver</h3><p>We arrive on time, do the job, and leave your windows spotless. If anything isn't right, we fix it. That's the guarantee.</p></div>
       </div>
     </div>
   </div>
@@ -659,164 +417,128 @@
 
 <div class="wrap"><div class="rule"></div></div>
 
-<!-- ═══ TESTIMONIALS ═══ -->
-<section class="testimonials-section">
+<!-- STATS -->
+<section class="stats-section">
   <div class="wrap">
-    <div class="eyebrow">What Elko Is Saying</div>
-    <h2>10 five-star <em>reviews</em><br>and counting.</h2>
-    <!--
-      REPLACE THESE WITH YOUR REAL GOOGLE REVIEWS.
-      Go to your Google Business profile, copy 3 of your best reviews word-for-word.
-      Replace the blockquote text and reviewer names below.
-    -->
-    <div class="reviews-grid">
-
-      <div class="review-card">
-        <div class="stars" aria-label="5 out of 5 stars">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        </div>
-        <blockquote>"REPLACE WITH REAL REVIEW — Showed up on time, did incredible work on all our windows and screens. Couldn't believe the difference. Will definitely use again."</blockquote>
-        <div class="reviewer">— CUSTOMER NAME</div>
-        <div class="review-src">Google Review · Elko, NV</div>
+    <div class="eyebrow reveal">By the Numbers</div>
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num"><span class="count" data-target="40" data-suffix="+">0+</span></div>
+        <div class="stat-label">Happy Clients</div>
       </div>
-
-      <div class="review-card">
-        <div class="stars" aria-label="5 out of 5 stars">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        </div>
-        <blockquote>"REPLACE WITH REAL REVIEW — Super easy to work with. Got back to me same day, scheduled around my availability, and left everything spotless. Exactly what you want from a local company."</blockquote>
-        <div class="reviewer">— CUSTOMER NAME</div>
-        <div class="review-src">Google Review · Elko, NV</div>
+      <div class="stat-item reveal" style="transition-delay:.10s">
+        <div class="stat-num"><span class="count" data-target="10" data-suffix="">0</span><span class="accent">★</span></div>
+        <div class="stat-label">Five-Star Google Reviews</div>
       </div>
-
-      <div class="review-card">
-        <div class="stars" aria-label="5 out of 5 stars">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        </div>
-        <blockquote>"REPLACE WITH REAL REVIEW — Our storefront looks incredible. They're thorough, professional, and reliable. We've set up recurring service. Highly recommend."</blockquote>
-        <div class="reviewer">— CUSTOMER NAME</div>
-        <div class="review-src">Google Review · Commercial Client</div>
+      <div class="stat-item reveal" style="transition-delay:.20s">
+        <div class="stat-num"><span class="count" data-target="100" data-suffix="%">0%</span></div>
+        <div class="stat-label">Satisfaction Guaranteed</div>
       </div>
-
-    </div>
-    <div class="reviews-footer">
-      <a href="https://g.page/r/CWcIIirJ8A5tEBM/review" target="_blank" rel="noopener noreferrer">
-        Read All 10 Reviews on Google &rarr;
-      </a>
     </div>
   </div>
 </section>
 
-<!-- ═══ COMMERCIAL ═══ -->
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="wrap">
+    <div class="eyebrow reveal">What Elko Is Saying</div>
+    <h2 class="reveal" style="transition-delay:.06s">10 five-star <em>reviews</em><br>and counting.</h2>
+    <!--
+      REPLACE THESE 3 REVIEWS with your real Google reviews.
+      Go to your Google Business profile, copy the text word-for-word, and paste below.
+    -->
+    <div class="quote-list">
+      <div class="q-item reveal">
+        <div class="q-mark" aria-hidden="true">"</div>
+        <div class="q-stars" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p class="q-text">"REPLACE WITH REAL REVIEW — Showed up on time, did incredible work on all our windows and screens. Couldn't believe the difference. Will definitely use again."</p>
+        <div class="q-by">— CUSTOMER NAME</div>
+        <div class="q-src">Google Review · Elko, NV</div>
+      </div>
+      <div class="q-item reveal" style="transition-delay:.08s">
+        <div class="q-mark" aria-hidden="true">"</div>
+        <div class="q-stars" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p class="q-text">"REPLACE WITH REAL REVIEW — Super easy to work with. Got back to me same day, scheduled around my availability, left everything spotless. Exactly what you want from a local company."</p>
+        <div class="q-by">— CUSTOMER NAME</div>
+        <div class="q-src">Google Review · Elko, NV</div>
+      </div>
+      <div class="q-item reveal" style="transition-delay:.16s">
+        <div class="q-mark" aria-hidden="true">"</div>
+        <div class="q-stars" aria-label="5 stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <p class="q-text">"REPLACE WITH REAL REVIEW — Our storefront looks incredible. Thorough, professional, and reliable. We've set up recurring service. Highly recommend."</p>
+        <div class="q-by">— CUSTOMER NAME</div>
+        <div class="q-src">Google Review · Commercial Client</div>
+      </div>
+    </div>
+    <div class="reviews-footer reveal">
+      <a href="https://g.page/r/CWcIIirJ8A5tEBM/review" target="_blank" rel="noopener noreferrer">Read All 10 Reviews on Google &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- COMMERCIAL -->
 <section class="commercial-section">
   <div class="wrap">
-    <div class="commercial-inner">
+    <div class="comm-inner">
       <div>
-        <div class="eyebrow">Commercial Clients</div>
-        <h2>Recurring service.<br><em>Zero effort</em> on your end.</h2>
-        <p class="lead">Set up a recurring schedule and your property stays clean year-round — without you ever having to think about it again. We already serve businesses in Elko.</p>
-        <a href="#estimate" class="btn btn-sand" style="margin-top:36px">Get a Commercial Quote</a>
+        <div class="eyebrow reveal">Commercial Clients</div>
+        <h2 class="reveal" style="transition-delay:.06s">Recurring service.<br><em>Zero effort</em> on your end.</h2>
+        <p class="lead reveal" style="transition-delay:.12s">Set up a recurring schedule and your property stays clean year-round — without you ever having to think about it again.</p>
+        <a href="#estimate" class="btn btn-sand reveal" style="margin-top:36px;transition-delay:.18s">Get a Commercial Quote</a>
       </div>
-      <div class="client-stack">
-        <div class="client-card">
-          <strong>Focus Eyecare</strong>
-          <span>Commercial · Recurring Client</span>
-        </div>
-        <div class="client-card">
-          <strong>Boyd's Mercantile</strong>
-          <span>Commercial · Recurring Client</span>
-        </div>
+      <div class="client-stack reveal" style="transition-delay:.22s">
+        <div class="client-card"><strong>Focus Eyecare</strong><span>Commercial · Recurring Client</span></div>
+        <div class="client-card"><strong>Boyd's Mercantile</strong><span>Commercial · Recurring Client</span></div>
         <div class="client-next">Your business could be next &rarr;</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ ESTIMATE FORM ═══ -->
+<!-- ESTIMATE FORM -->
 <section class="form-section" id="estimate">
   <div class="wrap form-wrap">
-    <div class="eyebrow">Get Your Free Estimate</div>
-    <h2>We'll call you back<br>within <em>one business day.</em></h2>
-    <p class="lead">No pressure. No commitment. Just a clear price from a real person in Elko.</p>
-
-    <form
-      name="estimate"
-      method="POST"
-      data-netlify="true"
-      action="/thank-you"
-      style="margin-top:48px"
-    >
-      <!-- Netlify hidden field -->
+    <div class="eyebrow reveal">Get Your Free Estimate</div>
+    <h2 class="reveal" style="transition-delay:.06s">We'll call you back<br>within <em>one business day.</em></h2>
+    <p class="lead reveal" style="transition-delay:.12s">No pressure. No commitment. Just a clear price from a real person in Elko.</p>
+    <form name="estimate" method="POST" data-netlify="true" action="/thank-you" class="reveal" style="margin-top:48px;transition-delay:.18s">
       <input type="hidden" name="form-name" value="estimate">
-
       <div class="form-grid" style="margin-bottom:14px">
-        <div class="field">
-          <label for="first_name">First Name</label>
-          <input type="text" id="first_name" name="first_name" required placeholder="First">
-        </div>
-        <div class="field">
-          <label for="last_name">Last Name</label>
-          <input type="text" id="last_name" name="last_name" required placeholder="Last">
-        </div>
+        <div class="field"><label for="fn">First Name</label><input type="text" id="fn" name="first_name" required placeholder="First"></div>
+        <div class="field"><label for="ln">Last Name</label><input type="text" id="ln" name="last_name" required placeholder="Last"></div>
       </div>
-
-      <div class="field" style="margin-bottom:14px">
-        <label for="phone">Phone Number</label>
-        <input type="tel" id="phone" name="phone" required placeholder="(775) 460-6004">
-      </div>
-
-      <div class="field" style="margin-bottom:14px">
-        <label for="address">Service Address</label>
-        <input type="text" id="address" name="address" required placeholder="123 Main St, Elko, NV">
-      </div>
-
+      <div class="field" style="margin-bottom:14px"><label for="ph">Phone Number</label><input type="tel" id="ph" name="phone" required placeholder="(775) 460-6004"></div>
+      <div class="field" style="margin-bottom:14px"><label for="addr">Service Address</label><input type="text" id="addr" name="address" required placeholder="123 Main St, Elko, NV"></div>
       <div class="field" style="margin-bottom:14px">
         <label>What Do You Need?</label>
-        <div class="checkbox-group">
-          <label class="checkbox-label"><input type="checkbox" name="services" value="exterior"> Exterior</label>
-          <label class="checkbox-label"><input type="checkbox" name="services" value="interior"> Interior</label>
-          <label class="checkbox-label"><input type="checkbox" name="services" value="screens"> Screens</label>
-          <label class="checkbox-label"><input type="checkbox" name="services" value="commercial"> Commercial</label>
+        <div class="cb-group">
+          <label class="cb-label"><input type="checkbox" name="services" value="exterior"> Exterior</label>
+          <label class="cb-label"><input type="checkbox" name="services" value="interior"> Interior</label>
+          <label class="cb-label"><input type="checkbox" name="services" value="screens"> Screens</label>
+          <label class="cb-label"><input type="checkbox" name="services" value="commercial"> Commercial</label>
         </div>
       </div>
-
-      <div class="field" style="margin-bottom:0">
-        <label for="notes">Anything Else?</label>
-        <textarea id="notes" name="notes" rows="3" placeholder="Number of windows, stories, special requests..."></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-blue form-submit">Get My Free Estimate</button>
+      <div class="field" style="margin-bottom:0"><label for="notes">Anything Else?</label><textarea id="notes" name="notes" rows="3" placeholder="Number of windows, stories, special requests..."></textarea></div>
+      <button type="submit" class="btn btn-blue form-btn">Get My Free Estimate</button>
       <p class="form-note">We call back within one business day. No spam, ever.</p>
     </form>
   </div>
 </section>
 
-<!-- ═══ FINAL CTA ═══ -->
+<!-- FINAL CTA -->
 <section class="cta-section">
   <div class="wrap">
-    <div class="eyebrow">Ready to Get Started?</div>
-    <h2>Call us. We pick up.<br><em>That's the difference.</em></h2>
-    <p class="lead">No phone trees. No waiting. You call, we answer, and we get your windows on the schedule.</p>
-    <a href="tel:+17754606004" class="cta-phone">(775) 460-6004</a>
-    <p class="cta-or">— or —</p>
-    <a href="#estimate" class="btn btn-blue" style="font-size:18px;padding:19px 44px">Use the Form Above</a>
-    <span class="cta-sub">Estimate within 1 business day · No commitment required</span>
+    <div class="eyebrow reveal">Ready to Get Started?</div>
+    <h2 class="reveal" style="transition-delay:.06s">Call us. We pick up.<br><em>That's the difference.</em></h2>
+    <p class="lead reveal" style="transition-delay:.12s">No phone trees. No waiting. You call, we answer, and we get your windows on the schedule.</p>
+    <a href="tel:+17754606004" class="cta-phone reveal" style="transition-delay:.18s">(775) 460-6004</a>
+    <p class="cta-or reveal" style="transition-delay:.24s">— or —</p>
+    <a href="#estimate" class="btn btn-blue reveal" style="font-size:18px;padding:20px 48px;transition-delay:.30s">Use the Form Above</a>
+    <span class="cta-sub reveal" style="transition-delay:.36s">Estimate within 1 business day · No commitment required</span>
   </div>
 </section>
 
-<!-- ═══ FOOTER ═══ -->
+<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -832,5 +554,67 @@
   </div>
 </footer>
 
+<script>
+  // Page fade-in
+  document.addEventListener('DOMContentLoaded', () => { document.body.style.opacity = '1'; });
+
+  // Scroll reveals
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } });
+  }, { threshold: 0.10, rootMargin: '0px 0px -36px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+  // Custom cursor
+  const cur = document.getElementById('cur');
+  if (window.matchMedia('(hover: hover)').matches) {
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+      cur.classList.add('on');
+    });
+    document.addEventListener('mouseleave', () => cur.classList.remove('on'));
+    document.querySelectorAll('a, button, .svc-row, .cb-label').forEach(el => {
+      el.addEventListener('mouseenter', () => cur.classList.add('big'));
+      el.addEventListener('mouseleave', () => cur.classList.remove('big'));
+    });
+  }
+
+  // Nav scroll transform
+  const navEl = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    navEl.classList.toggle('scrolled', window.scrollY > 24);
+  }, { passive: true });
+
+  // Magnetic buttons
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width  / 2) * 0.18;
+      const y = (e.clientY - r.top  - r.height / 2) * 0.18;
+      btn.style.transform = `translate(${x}px,${y}px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+
+  // Stats counter
+  const countObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = +el.dataset.target;
+      const suffix = el.dataset.suffix || '';
+      const t0 = performance.now();
+      const dur = 1400;
+      (function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const v = Math.round((1 - Math.pow(1 - p, 3)) * target);
+        el.textContent = v + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      })(t0);
+      countObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.count').forEach(el => countObs.observe(el));
+</script>
 </body>
 </html>
