@@ -1,0 +1,43 @@
+<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <!-- Blue Background -->
+  <rect width="400" height="600" fill="rgb(34, 112, 212)"/>
+  
+  <!-- Floating Squeegee Animation -->
+  <defs>
+    <style>
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px) rotate(15deg);
+        }
+        50% {
+          transform: translateY(-30px) rotate(15deg);
+        }
+      }
+      .squeegee {
+        animation: float 4s ease-in-out infinite;
+        transform-origin: center;
+      }
+    </style>
+  </defs>
+  
+  <!-- Squeegee -->
+  <g class="squeegee" transform="translate(200, 300)">
+    <!-- Handle -->
+    <rect x="-8" y="-80" width="16" height="100" fill="rgb(50, 50, 50)" rx="8"/>
+    
+    <!-- Grip texture on handle -->
+    <circle cx="-8" cy="-40" r="3" fill="rgba(255, 255, 255, 0.3)"/>
+    <circle cx="8" cy="-40" r="3" fill="rgba(255, 255, 255, 0.3)"/>
+    <circle cx="-8" cy="-20" r="3" fill="rgba(255, 255, 255, 0.3)"/>
+    <circle cx="8" cy="-20" r="3" fill="rgba(255, 255, 255, 0.3)"/>
+    
+    <!-- Blade connector -->
+    <rect x="-12" y="20" width="24" height="12" fill="rgb(60, 60, 60)" rx="2"/>
+    
+    <!-- Rubber blade -->
+    <path d="M -50 32 Q -50 50 0 55 Q 50 50 50 32 L 50 35 Q 50 52 0 58 Q -50 52 -50 35 Z" fill="rgb(200, 200, 200)"/>
+    
+    <!-- Blade shine -->
+    <ellipse cx="0" cy="34" rx="45" ry="3" fill="rgba(255, 255, 255, 0.4)"/>
+  </g>
+</svg>
