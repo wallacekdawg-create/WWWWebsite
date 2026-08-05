@@ -35,14 +35,15 @@
     /* ── CURSOR ── */
     #cur {
       position: fixed; top: 0; left: 0; z-index: 9999;
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--sand); pointer-events: none;
-      transform: translate(-50%,-50%);
-      transition: width .2s, height .2s, background .2s, opacity .3s;
+      width: 16px; height: 16px; border-radius: 50% 50% 50% 0;
+      background: var(--blue); border: 2px solid var(--sand);
+      pointer-events: none;
+      transform: translate(-50%,-50%) rotate(45deg);
+      transition: width .2s, height .2s, background .2s, opacity .3s, border-width .2s;
       opacity: 0;
     }
     #cur.on  { opacity: 1; }
-    #cur.big { width: 34px; height: 34px; background: rgba(236,206,168,.22); border: 1.5px solid var(--sand); }
+    #cur.big { width: 40px; height: 40px; background: rgba(34,112,212,.28); border: 2px solid var(--sand); }
 
     /* ── REVEALS ── */
     .reveal { opacity: 0; transform: translateY(26px); transition: opacity .75s ease, transform .75s ease; }
