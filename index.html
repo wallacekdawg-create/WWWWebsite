@@ -97,6 +97,9 @@
     .nav-logo svg { width: 40px; height: auto; color: var(--navy); }
     .nav-wordmark { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; color: var(--navy); line-height: 1.1; }
     .nav-wordmark span { display: block; color: var(--blue); font-size: 9px; letter-spacing: .24em; font-weight: 600; }
+    .nav-links { display: flex; align-items: center; gap: 26px; }
+    .nav-link { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; color: var(--navy); text-decoration: none; transition: color .18s; }
+    .nav-link:hover { color: var(--blue); }
     .nav-phone { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px; color: var(--navy); text-decoration: none; letter-spacing: .04em; transition: color .18s; }
     .nav-phone:hover { color: var(--blue); }
     .nav-cta {
@@ -294,6 +297,7 @@
       .stat-item:last-child { border-top: 1px solid rgba(255,255,255,.08); grid-column: 1/-1; border-right: none; padding-left: 0; }
       section { padding: 90px 0; }
       .nav-phone { display: none; }
+      .nav-links { display: none; }
     }
     @media (max-width: 620px) {
       .svc-row       { grid-template-columns: 44px 1fr; gap: 0 18px; padding: 28px 0; }
@@ -331,6 +335,9 @@
       <svg viewBox="0 0 1000 606.2" aria-hidden="true"><use href="#wmark"/></svg>
       <div class="nav-wordmark">Wallace<span>Window Washing</span></div>
     </a>
+    <div class="nav-links">
+      <a href="/blog/" class="nav-link">Blog</a>
+    </div>
     <a href="tel:+17754606004" class="nav-phone">(775) 460-6004</a>
     <a href="#estimate" class="nav-cta">Free Estimate</a>
   </div>
@@ -612,6 +619,7 @@
       <div class="footer-brand-name">Wallace Window Washing</div>
     </div>
     <nav class="footer-links" aria-label="Footer navigation">
+      <a href="/blog/">Blog</a>
       <a href="#estimate">Free Estimate</a>
       <a href="tel:+17754606004">(775) 460-6004</a>
       <a href="https://g.page/r/CWcIIirJ8A5tEBM/review" target="_blank" rel="noopener noreferrer">Google Reviews</a>
