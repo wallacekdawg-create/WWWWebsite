@@ -153,6 +153,11 @@ footer { background: #060F1E; padding: 52px 0; }
   text-transform: uppercase; color: var(--navy); margin: 56px 0 22px;
 }
 .post-content h2:first-child { margin-top: 0; }
+.post-content h3 {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: clamp(20px,2.6vw,25px); line-height: 1.15; letter-spacing: .02em;
+  text-transform: uppercase; color: var(--blue); margin: 34px 0 10px;
+}
 .post-content strong { color: var(--navy); }
 .post-content ul, .post-content ol { margin: 0 0 26px; padding-left: 26px; }
 .post-content li { margin-bottom: 10px; }
