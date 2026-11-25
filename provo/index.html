@@ -489,7 +489,7 @@ nav.scrolled .nav-logo img { height: 38px; }
 .m-dot { background: var(--ivory); opacity: .8; }
 .checker { height: 14px; background: repeating-linear-gradient(90deg, var(--vsand) 0 14px, var(--ivory) 14px 28px); }
 .why-section, .stats-section, .cta-section { background: var(--red); }
-.why-item { background: var(--red); border-color: rgba(244,230,200,.22); }
+.why-item { background: var(--red); border-color: rgba(244,230,200,.15); }
 .why-grid { background: rgba(244,230,200,.3); border-color: rgba(244,230,200,.4); }
 .why-n { color: var(--ivory); opacity: .45; }
 .why-item h3 { color: var(--ivory); }
@@ -524,6 +524,46 @@ footer { background: var(--navy); }
 .footer-brand-name, .footer-links a, .footer-copy { color: rgba(244,230,200,.82); }
 .footer-links a:hover { color: #fff; }
 .hero h1, .stat-num, .svc-n, .why-n, .tier-name { font-style: normal; }
+/* ── HERO: slow sunburst + glass glint ── */
+.hero { background: var(--red); isolation: isolate; }
+.hero-art { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+.hero-burst {
+  position: absolute; left: 72%; top: 58%; width: 260vmax; height: 260vmax; margin: -130vmax 0 0 -130vmax;
+  background: repeating-conic-gradient(from 0deg, rgba(244,230,200,.16) 0deg 6deg, rgba(244,230,200,0) 6deg 12deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 4%, #000 14%, #000 40%, transparent 62%);
+          mask-image: radial-gradient(circle, transparent 0 4%, #000 14%, #000 40%, transparent 62%);
+  animation: burst-spin 140s linear infinite;
+}
+.hero-sun { position: absolute; left: 72%; top: 58%; width: 26vmin; height: 26vmin; margin: -13vmin 0 0 -13vmin; border-radius: 50%; background: rgba(244,230,200,.14); box-shadow: 0 0 0 3vmin rgba(244,230,200,.07); }
+.hero-glass {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(90deg, transparent calc(33.333% - 2px), rgba(244,230,200,.15) calc(33.333% - 2px) calc(33.333% + 2px), transparent calc(33.333% + 2px), transparent calc(66.666% - 2px), rgba(244,230,200,.15) calc(66.666% - 2px) calc(66.666% + 2px), transparent calc(66.666% + 2px)),
+    linear-gradient(180deg, transparent calc(50% - 2px), rgba(244,230,200,.15) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px));
+}
+.hero-glint {
+  position: absolute; top: -20%; bottom: -20%; left: 0; width: 22%;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.10) 30%, rgba(255,255,255,.30) 48%, rgba(255,255,255,.10) 66%, rgba(255,255,255,0) 100%);
+  transform: translateX(-160%) skewX(-18deg);
+  animation: glint 7s cubic-bezier(.45,.05,.35,1) infinite;
+}
+.hero-spark { position: absolute; width: 34px; height: 34px; fill: #fff; opacity: 0; transform: scale(.2); animation: spark 7s ease-out infinite; }
+.hero-spark.s1 { left: 30%; top: 26%; animation-delay: 1.35s; }
+.hero-spark.s2 { left: 58%; top: 70%; width: 24px; height: 24px; animation-delay: 2.15s; }
+.hero-spark.s3 { left: 84%; top: 34%; animation-delay: 2.7s; }
+@keyframes burst-spin { to { transform: rotate(360deg); } }
+@keyframes glint { 0% { transform: translateX(-160%) skewX(-18deg); } 45%, 100% { transform: translateX(560%) skewX(-18deg); } }
+@keyframes spark { 0%, 100% { opacity: 0; transform: scale(.2) rotate(0deg); } 4% { opacity: 1; transform: scale(1) rotate(20deg); } 10% { opacity: 0; transform: scale(.4) rotate(45deg); } }
+@media (max-width: 768px) {
+  .hero-burst, .hero-sun { left: 50%; top: 78%; }
+  .hero-burst { animation-duration: 200s; }
+  .hero-glass { background-image: linear-gradient(90deg, transparent calc(50% - 2px), rgba(244,230,200,.2) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)), linear-gradient(180deg, transparent calc(50% - 2px), rgba(244,230,200,.2) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)); }
+  .hero-spark.s3 { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-burst, .hero-glint, .hero-spark { animation: none; }
+  .hero-glint, .hero-spark { display: none; }
+}
 </style>
 </head>
 <body>
@@ -541,7 +581,7 @@ footer { background: var(--navy); }
 <nav id="nav" aria-label="Site navigation">
   <div class="nav-inner">
     <a href="/" class="nav-logo" aria-label="SAUCE Window Cleaning">
-      <img src="/assets/sauce-logo-red.png" alt="SAUCE Window Cleaning" width="113" height="46">
+      <img src="../assets/sauce-logo-red.png" alt="SAUCE Window Cleaning" width="113" height="46">
     </a>
     <div class="nav-links">
       <a href="#pricing" class="nav-link">Packages</a>
@@ -555,10 +595,18 @@ footer { background: var(--navy); }
 
 <!-- HERO -->
 <section class="hero" aria-label="Hero">
-  <canvas id="sq-canvas" aria-hidden="true"></canvas>
+  <div class="hero-art" aria-hidden="true">
+    <div class="hero-burst"></div>
+    <div class="hero-sun"></div>
+    <div class="hero-glass"></div>
+    <div class="hero-glint"></div>
+    <svg class="hero-spark s1" viewBox="0 0 24 24"><path d="M12 0C12.6 7.4 16.6 11.4 24 12C16.6 12.6 12.6 16.6 12 24C11.4 16.6 7.4 12.6 0 12C7.4 11.4 11.4 7.4 12 0Z"/></svg>
+    <svg class="hero-spark s2" viewBox="0 0 24 24"><path d="M12 0C12.6 7.4 16.6 11.4 24 12C16.6 12.6 12.6 16.6 12 24C11.4 16.6 7.4 12.6 0 12C7.4 11.4 11.4 7.4 12 0Z"/></svg>
+    <svg class="hero-spark s3" viewBox="0 0 24 24"><path d="M12 0C12.6 7.4 16.6 11.4 24 12C16.6 12.6 12.6 16.6 12 24C11.4 16.6 7.4 12.6 0 12C7.4 11.4 11.4 7.4 12 0Z"/></svg>
+  </div>
   <div class="hero-inner">
     <p class="hero-eyebrow reveal">Provo · Orem · Lehi · Utah County · Park City</p>
-    <h1 class="reveal" style="transition-delay:.12s">Provo's <em>Window</em> Washing Company.</h1>
+    <h1 class="reveal" style="transition-delay:.12s">Provo's <em>window</em> Washing Company.</h1>
     <p class="hero-sub reveal" style="transition-delay:.24s">Crystal-clear windows for your Utah County home or business. Hard water spots, winter grime, and spring pollen, gone. Three simple packages backed by a 2-day rain guarantee.</p>
     <div class="hero-actions reveal" style="transition-delay:.36s">
       <a href="#pricing" class="btn btn-sand" style="font-size:18px;padding:20px 48px">See Packages &amp; Book</a>
@@ -934,7 +982,7 @@ footer { background: var(--navy); }
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
-      <img src="/assets/sauce-logo-ivory.png" alt="" width="98" height="40">
+      <img src="../assets/sauce-logo-ivory.png" alt="" width="98" height="40">
       <div class="footer-brand-name">SAUCE Window Cleaning</div>
     </div>
     <nav class="footer-links" aria-label="Footer navigation">
@@ -1016,134 +1064,6 @@ footer { background: var(--navy); }
   }, { threshold: 0.5 });
   document.querySelectorAll('.count').forEach(el => countObs.observe(el));
 
-  // 3D Squeegee Background
-  (function() {
-    const canvas = document.getElementById('sq-canvas');
-    const ctx = canvas.getContext('2d');
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function resize() {
-      const hero = canvas.parentElement;
-      canvas.width  = hero.offsetWidth;
-      canvas.height = hero.offsetHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    let mx = 0.5, my = 0.5;
-    if (!reduced) {
-      document.addEventListener('mousemove', e => {
-        mx = e.clientX / window.innerWidth;
-        my = e.clientY / window.innerHeight;
-      });
-    }
-    let crx = 0, cry = 0;
-
-    // Brand colors per face
-    const C = {
-      bladeFront : '#12192a', bladeSide  : '#080d14',
-      frameFront : '#ECCEA8', frameSide  : '#c9a97a', frameTop : '#f5debb',
-      hFront     : '#1c4a9a', hSide      : '#0E2A52', hTop     : '#2a6ad4',
-    };
-
-    // 3D rotation helpers
-    function rotX([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x, y*c-z*s, y*s+z*c]; }
-    function rotY([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x*c+z*s, y,-x*s+z*c]; }
-    function rotZ([x,y,z], a) { const c=Math.cos(a),s=Math.sin(a); return [x*c-y*s, x*s+y*c, z]; }
-
-    function proj(v, cx, cy) {
-      const fl = 700, sc = fl / (fl + v[2]);
-      return [cx + v[0]*sc, cy + v[1]*sc];
-    }
-
-    // Build a box's 6 faces, each with 4 vertices and a fill color
-    function box(w, h, d, ox, oy, oz, fc, sc, tc) {
-      const hx=w/2, hy=h/2, hz=d/2;
-      return [
-        { verts:[[-hx+ox,-hy+oy, hz+oz],[ hx+ox,-hy+oy, hz+oz],[ hx+ox, hy+oy, hz+oz],[-hx+ox, hy+oy, hz+oz]], color:fc },
-        { verts:[[ hx+ox,-hy+oy,-hz+oz],[-hx+ox,-hy+oy,-hz+oz],[-hx+ox, hy+oy,-hz+oz],[ hx+ox, hy+oy,-hz+oz]], color:sc },
-        { verts:[[-hx+ox,-hy+oy,-hz+oz],[ hx+ox,-hy+oy,-hz+oz],[ hx+ox,-hy+oy, hz+oz],[-hx+ox,-hy+oy, hz+oz]], color:tc },
-        { verts:[[-hx+ox, hy+oy, hz+oz],[ hx+ox, hy+oy, hz+oz],[ hx+ox, hy+oy,-hz+oz],[-hx+ox, hy+oy,-hz+oz]], color:sc },
-        { verts:[[-hx+ox,-hy+oy,-hz+oz],[-hx+ox,-hy+oy, hz+oz],[-hx+ox, hy+oy, hz+oz],[-hx+ox, hy+oy,-hz+oz]], color:sc },
-        { verts:[[ hx+ox,-hy+oy, hz+oz],[ hx+ox,-hy+oy,-hz+oz],[ hx+ox, hy+oy,-hz+oz],[ hx+ox, hy+oy, hz+oz]], color:sc },
-      ];
-    }
-
-    // Build handle as a tilted box by rotating its vertices ~30° on X axis around frame top
-    function tiltedHandle() {
-      const w=14, h=200, d=14;
-      const ang = -0.52; // tilt forward
-      const raw = box(w, h, d, 0, 0, 0, C.hFront, C.hSide, C.hTop);
-      return raw.map(f => ({
-        ...f,
-        verts: f.verts.map(([x,y,z]) => {
-          // tilt around top of handle (y = -h/2)
-          const ly = y + h/2;
-          const ty = ly * Math.cos(ang) - z * Math.sin(ang);
-          const tz = ly * Math.sin(ang) + z * Math.cos(ang);
-          return [x, ty - h/2 - 34, tz + 10];
-        })
-      }));
-    }
-
-    // All faces of the squeegee
-    const SQ = [
-      ...box(240, 10, 8,  0,  0,  0, C.bladeFront, C.bladeSide, C.bladeSide),
-      ...box(210, 24, 18, 0, -20,  5, C.frameFront, C.frameSide, C.frameTop),
-      ...tiltedHandle(),
-    ];
-
-    function renderFrame(time) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const t = time / 1000;
-      const floatY  = reduced ? 0 : Math.sin(t * 0.55) * 22;
-      const autoRY  = reduced ? 0.45 : t * 0.20;
-      const autoRZ  = reduced ? 0    : Math.sin(t * 0.38) * 0.055;
-
-      const trx = (my - 0.5) * 0.50;
-      const try_ = (mx - 0.5) * 0.70;
-      crx += (trx - crx) * 0.035;
-      cry += (try_ - cry) * 0.035;
-
-      const rx = crx, ry = autoRY + cry, rz = autoRZ;
-      const scale = canvas.height * 0.00175;
-      const cx = canvas.width  * 0.70;
-      const cy = canvas.height * 0.50 + floatY;
-
-      // Transform all faces
-      const tf = SQ.map(f => {
-        const tv = f.verts.map(v => {
-          let p = rotX(v, rx);
-          p = rotY(p, ry);
-          p = rotZ(p, rz);
-          return [p[0]*scale, p[1]*scale, p[2]*scale];
-        });
-        const avgZ = tv.reduce((s,v)=>s+v[2],0)/tv.length;
-        return { color: f.color, tv, avgZ };
-      });
-
-      // Back-to-front sort (painter's algorithm)
-      tf.sort((a,b) => a.avgZ - b.avgZ);
-
-      tf.forEach(f => {
-        const pts = f.tv.map(v => proj(v, cx, cy));
-        ctx.beginPath();
-        ctx.moveTo(pts[0][0], pts[0][1]);
-        for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0], pts[i][1]);
-        ctx.closePath();
-        ctx.fillStyle = f.color;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(0,0,0,0.20)';
-        ctx.lineWidth = 0.7;
-        ctx.stroke();
-      });
-
-      requestAnimationFrame(renderFrame);
-    }
-
-    requestAnimationFrame(renderFrame);
-  })();
 </script>
 </body>
 </html>
