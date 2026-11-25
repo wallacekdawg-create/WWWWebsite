@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wallacewindow.com/sitemap.xml
+Sitemap: https://saucewindow.com/sitemap.xml
